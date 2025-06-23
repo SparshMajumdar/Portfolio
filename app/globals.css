@@ -193,6 +193,16 @@
     color: #4dffb1;
     transition: color 0.3s ease;
   }
+  @media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+
+  body {
+    cursor: default !important;
+  }
+}
+
 }
 
 @layer components {
