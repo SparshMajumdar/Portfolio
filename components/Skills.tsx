@@ -8,44 +8,44 @@ const Skills = () => {
     {
       title: "Programming Languages",
       skills: [
-        { name: "Python", level: 90 },
-        { name: "JavaScript", level: 85 },
-        { name: "C/C++", level: 80 },
-        { name: "HTML/CSS", level: 88 },
-        { name: "SQL/Postgres", level: 75 },
-        { name: "R", level: 70 }
+        { name: "Python"},
+        { name: "JavaScript"},
+        { name: "C/C++"},
+        { name: "HTML/CSS" },
+        { name: "SQL/Postgres" },
+        { name: "R" }
       ]
     },
     {
       title: "Frameworks & Tools",
       skills: [
-        { name: "React", level: 85 },
-        { name: "Node.js", level: 80 },
-        { name: "Next.js", level: 85 },
-        { name: "Flask", level: 75 },
-        { name: "OSINT", level: 80 }
+        { name: "React" },
+        { name: "Node.js" },
+        { name: "Next.js" },
+        { name: "Flask" },
+        { name: "OSINT" }
       ]
     },
     {
       title: "Developer Tools & Libraries",
       skills: [
-        { name: "Git", level: 85 },
-        { name: "VS Code", level: 90 },
-        { name: "Kali Linux", level: 80 },
-        { name: "Burpsuite", level: 75 },
-        { name: "Metasploit", level: 70 },
-        { name: "Wireshark", level: 75 },
-        { name: "Cisco Packet Tracer", level: 80 }
+        { name: "Git"},
+        { name: "VS Code"},
+        { name: "Kali Linux"},
+        { name: "Burpsuite"},
+        { name: "Metasploit"},
+        { name: "Wireshark"},
+        { name: "Cisco Packet Tracer"}
       ]
     },
     {
       title: "Libraries & Automation",
       skills: [
-        { name: "pandas", level: 80 },
-        { name: "NumPy", level: 75 },
-        { name: "Matplotlib", level: 70 },
-        { name: "Selenium", level: 85 },
-        { name: "Beautiful Soup", level: 80 }
+        { name: "pandas"},
+        { name: "NumPy"},
+        { name: "Matplotlib"},
+        { name: "Selenium"},
+        { name: "Beautiful Soup"}
       ]
     }
   ];
@@ -86,16 +86,6 @@ const Skills = () => {
                   <div key={skillIndex}>
                     <div className="flex justify-between mb-1">
                       <span className="text-gray-700 dark:text-gray-300">{skill.name}</span>
-                      <span className="text-gray-600 dark:text-gray-400">{skill.level}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${skill.level}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: categoryIndex * 0.2 + skillIndex * 0.1 }}
-                        className="bg-primary-500 h-2 rounded-full"
-                      />
                     </div>
                   </div>
                 ))}

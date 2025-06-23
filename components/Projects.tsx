@@ -21,8 +21,8 @@ const projects = [
     image: "https://images.pexels.com/photos/8370752/pexels-photo-8370752.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     tags: ["Arduino", "Next.js", "Firebase", "IoT", "Real-time Data"],
     links: {
-      github: "https://github.com/username/electro-buck",
-      live: "https://electro-buck.demo"
+      github: "https://github.com/SparshMajumdar/ElectroBuck",
+      live: "https://electro-buck.vercel.app/"
     }
   },
   {
