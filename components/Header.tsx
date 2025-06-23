@@ -77,7 +77,7 @@ const Header: React.FC = () => {
               <Github size={20} />
             </motion.a>
             <motion.a
-              href="www.linkedin.com/in/sparsh-majumdar-03820b288"
+              href="https://www.linkedin.com/in/sparsh-majumdar-03820b288/"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.1 }}
@@ -152,7 +152,7 @@ const Header: React.FC = () => {
                 <Github size={20} />
               </a>
               <a
-                href="www.linkedin.com/in/sparsh-majumdar-03820b288"
+                href="https://www.linkedin.com/in/sparsh-majumdar-03820b288/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-primary-500 dark:text-gray-400 dark:hover:text-white"

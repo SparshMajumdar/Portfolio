@@ -67,7 +67,7 @@ const Hero: React.FC = () => {
               className="flex justify-center lg:justify-start space-x-6 mb-12"
             >
               <a
-                href="https://github.com/"
+                href="https://github.com/SparshMajumdar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-primary-500 dark:text-gray-400 dark:hover:text-white transition-colors"
@@ -75,7 +75,7 @@ const Hero: React.FC = () => {
                 <Github size={24} />
               </a>
               <a
-                href="https://linkedin.com/in/sparsh"
+                href="https://www.linkedin.com/in/sparsh-majumdar-03820b288/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 hover:text-primary-500 dark:text-gray-400 dark:hover:text-white transition-colors"

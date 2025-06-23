@@ -61,7 +61,7 @@ const Footer: React.FC = () => {
             className="flex space-x-6 mb-8"
           >
             <a
-              href="https://github.com/"
+              href="https://github.com/SparshMajumdar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white transition-colors"
@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
               <Github size={20} />
             </a>
             <a
-              href="https://linkedin.com/in/sparsh"
+              href="https://www.linkedin.com/in/sparsh-majumdar-03820b288/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white transition-colors"
