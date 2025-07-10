@@ -36,15 +36,7 @@ const Header: React.FC = () => {
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        <motion.a 
-          href="#home"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-xl md:text-2xl font-display font-bold text-primary-950 dark:text-white"
-        >
-          Sparsh<span className="text-accent-400">.</span>
-        </motion.a>
+        <div /> {/* ✅ Empty div replaces logo or text */}
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">

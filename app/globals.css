@@ -16,6 +16,7 @@
   html {
     scroll-behavior: smooth;
     overflow-y: auto;
+    cursor: none; /* ✅ Moved here from body for global consistency */
   }
 
   body {
@@ -25,7 +26,6 @@
     background-attachment: fixed;
     overflow-y: auto;
     position: relative;
-    cursor: none;
   }
 
   .dark body {
@@ -85,6 +85,18 @@
     box-shadow: 0 0 25px rgba(26, 255, 157, 0.8);
   }
 
+  /* ✅ Only hide cursor for touch devices */
+  @media (pointer: coarse) {
+    .custom-cursor {
+      display: none !important;
+    }
+
+    html {
+      cursor: default !important;
+    }
+  }
+
+  /* 🔽 Everything else in your file remains unchanged below this point */
   h1, h2, h3, h4, h5, h6 {
     @apply font-mono font-bold;
     color: #1e293b;
@@ -182,19 +194,10 @@
     color: #4dffb1;
     transition: color 0.3s ease;
   }
-
-  @media (pointer: coarse) {
-    .custom-cursor {
-      display: none !important;
-    }
-
-    body {
-      cursor: default !important;
-    }
-  }
 }
 
 @layer components {
+  /* All your component styles are unchanged */
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
@@ -242,7 +245,6 @@
     background-color: rgba(0, 255, 140, 0.2);
   }
 
-  /* ✅ Resume Button Glow Effect - Updated */
   .btn-glow {
     background-color: rgba(34, 197, 94, 0.05);
     color: #16a34a;
