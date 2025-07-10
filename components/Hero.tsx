@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, ChevronDown, Shield } from 'lucide-react';
+import { Github, Linkedin, Mail, ChevronDown, Shield, Download } from 'lucide-react';
 import FloatingCube from './FloatingCube';
 
 const Hero: React.FC = () => {
@@ -24,7 +24,7 @@ const Hero: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFact((prev) => (prev + 1) % cybersecurityFacts.length);
-    }, 4000); // Change fact every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [cybersecurityFacts.length]);
@@ -50,7 +50,7 @@ const Hero: React.FC = () => {
             >
               Hi, I'm <span className="text-accent-400">Sparsh</span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -64,7 +64,7 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex justify-center lg:justify-start space-x-6 mb-12"
+              className="flex justify-center lg:justify-start space-x-6 mb-6"
             >
               <a
                 href="https://github.com/SparshMajumdar"
@@ -87,6 +87,23 @@ const Hero: React.FC = () => {
                 className="text-gray-700 hover:text-primary-500 dark:text-gray-400 dark:hover:text-white transition-colors"
               >
                 <Mail size={24} />
+              </a>
+            </motion.div>
+
+            {/* Download Resume Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="flex justify-center lg:justify-start"
+            >
+              <a
+                href="/Sparsh_Resume.pdf"
+                download
+                className="btn btn-primary btn-glow flex items-center gap-2 font-mono text-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              >
+                <Download className="w-5 h-5" />
+                Download Resume
               </a>
             </motion.div>
           </div>
@@ -134,7 +151,7 @@ const Hero: React.FC = () => {
                   >
                     Cybersecurity Fact
                   </motion.h3>
-                  
+
                   <motion.div
                     key={currentFact}
                     initial={{ opacity: 0, y: 20 }}
@@ -153,11 +170,10 @@ const Hero: React.FC = () => {
                     {cybersecurityFacts.map((_, index) => (
                       <div
                         key={index}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          index === currentFact 
-                            ? 'bg-green-400 scale-125' 
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentFact
+                            ? 'bg-green-400 scale-125'
                             : 'bg-green-600 opacity-50'
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
