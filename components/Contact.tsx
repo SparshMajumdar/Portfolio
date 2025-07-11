@@ -3,17 +3,28 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Send } from 'lucide-react';
-import { ContactForm, ContactFormSchema, submitContactForm } from '@/lib/supabase';
+import { ContactForm } from '@/lib/mongo';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState<ContactForm>({
     name: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
   });
+
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string>('');
+
+  const parseErrorMessage = (errorObj: any) => {
+    if (typeof errorObj === 'string') return errorObj;
+    if (Array.isArray(errorObj)) return errorObj[0]?.message || 'Form submission failed.';
+    if (typeof errorObj === 'object' && errorObj !== null) {
+      const firstField = Object.values(errorObj)[0];
+      return Array.isArray(firstField) ? firstField[0] : 'Form submission failed.';
+    }
+    return 'Unknown error occurred';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,18 +32,26 @@ const Contact: React.FC = () => {
     setError('');
 
     try {
-      const validatedData = ContactFormSchema.parse(formData);
-      const result = await submitContactForm(validatedData);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
 
       if (result.success) {
         setStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
+
+        // Optional: Reset form message after a while
+        setTimeout(() => setStatus('idle'), 4000);
       } else {
-        throw new Error('Failed to submit form');
+        throw new Error(parseErrorMessage(result.error));
       }
     } catch (err) {
       setStatus('error');
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     }
   };
 
@@ -62,6 +81,7 @@ const Contact: React.FC = () => {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
+            {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Name
@@ -76,6 +96,7 @@ const Contact: React.FC = () => {
               />
             </div>
 
+            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
@@ -90,6 +111,7 @@ const Contact: React.FC = () => {
               />
             </div>
 
+            {/* Subject Field */}
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Subject (Optional)
@@ -103,20 +125,22 @@ const Contact: React.FC = () => {
               />
             </div>
 
+            {/* Message Field */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Message
               </label>
               <textarea
                 id="message"
+                rows={5}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                rows={5}
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                 required
               />
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={status === 'submitting'}
@@ -124,7 +148,7 @@ const Contact: React.FC = () => {
             >
               {status === 'submitting' ? (
                 <>
-                  <Mail className="animate-spin\" size={20} />
+                  <Mail className="animate-spin" size={20} />
                   <span>Sending...</span>
                 </>
               ) : (
@@ -135,10 +159,10 @@ const Contact: React.FC = () => {
               )}
             </button>
 
+            {/* Success & Error Feedback */}
             {status === 'success' && (
               <p className="text-green-500 text-center">Message sent successfully!</p>
             )}
-
             {status === 'error' && (
               <p className="text-red-500 text-center">{error}</p>
             )}
