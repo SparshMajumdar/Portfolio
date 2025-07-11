@@ -93,7 +93,7 @@ const Footer: React.FC = () => {
           >
             <p>&copy; {new Date().getFullYear()} Sparsh Majumdar. All rights reserved.</p>
             <p className="mt-1">
-              Designed and built with <span className="text-red-500">♥</span> by Sparsh
+              Designed and built by Sparsh
             </p>
           </motion.div>
         </div>
