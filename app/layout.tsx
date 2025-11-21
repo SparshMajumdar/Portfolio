@@ -1,10 +1,11 @@
-import { Share_Tech_Mono } from 'next/font/google';
+import { VT323 } from 'next/font/google';
 import { ThemeProvider } from '@/context/ThemeContext';
 import './globals.css';
 
-const techMono = Share_Tech_Mono({ 
+const vt323 = VT323({
   weight: '400',
   subsets: ['latin'],
+  variable: '--font-vt323',
 });
 
 export const metadata = {
@@ -42,7 +43,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="192x192" href="/web-app-manifest-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/web-app-manifest-512x512.png" />
       </head>
-      <body className={`${techMono.className} antialiased matrix-bg`}>
+      <body className={`${vt323.variable} font-sans antialiased matrix-bg`}>
         <div id="custom-cursor" className="custom-cursor"></div>
         <ThemeProvider>
           <div className="relative">
@@ -51,36 +52,49 @@ export default function RootLayout({
         </ThemeProvider>
         <script dangerouslySetInnerHTML={{
           __html: `
-            document.addEventListener('DOMContentLoaded', function() {
-              const cursor = document.getElementById('custom-cursor');
-              let mouseX = 0;
-              let mouseY = 0;
-
-              document.addEventListener('mousemove', function(e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                cursor.style.left = mouseX - 10 + 'px';
-                cursor.style.top = mouseY - 10 + 'px';
-              });
-
-              document.addEventListener('mouseenter', function() {
+            (function() {
+              if (typeof window !== 'undefined') {
+                const cursor = document.getElementById('custom-cursor');
+                if (!cursor) return;
+                
+                let mouseX = 0;
+                let mouseY = 0;
+                
+                // Set initial opacity
                 cursor.style.opacity = '1';
-              });
 
-              document.addEventListener('mouseleave', function() {
-                cursor.style.opacity = '0';
-              });
+                document.addEventListener('mousemove', function(e) {
+                  mouseX = e.clientX;
+                  mouseY = e.clientY;
+                  cursor.style.left = mouseX - 10 + 'px';
+                  cursor.style.top = mouseY - 10 + 'px';
+                });
 
-              const interactiveElements = document.querySelectorAll('a, button, [role="button"], input, textarea');
-              interactiveElements.forEach(element => {
-                element.addEventListener('mouseenter', function() {
-                  cursor.classList.add('hover');
+                document.addEventListener('mouseenter', function() {
+                  cursor.style.opacity = '1';
                 });
-                element.addEventListener('mouseleave', function() {
-                  cursor.classList.remove('hover');
+
+                document.addEventListener('mouseleave', function() {
+                  cursor.style.opacity = '0';
                 });
-              });
-            });
+
+                const updateInteractive = function() {
+                  const interactiveElements = document.querySelectorAll('a, button, [role="button"], input, textarea');
+                  interactiveElements.forEach(element => {
+                    element.addEventListener('mouseenter', function() {
+                      cursor.classList.add('hover');
+                    });
+                    element.addEventListener('mouseleave', function() {
+                      cursor.classList.remove('hover');
+                    });
+                  });
+                };
+                
+                // Run on load and after delay to catch dynamically added elements
+                updateInteractive();
+                setTimeout(updateInteractive, 1000);
+              }
+            })();
           `
         }} />
       </body>

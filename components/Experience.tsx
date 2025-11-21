@@ -6,44 +6,40 @@ import { Briefcase, Calendar } from 'lucide-react';
 
 const experiences = [
   {
-    title: "Cyber Security Analyst - Technical Team",
-    company: "Be a Nerd (VIT-AP Club)",
+    title: "Technical Team Member",
+    company: "Be a Nerd Club, VIT-AP",
     period: "2023",
-    description: "Led cybersecurity initiatives and conducted security assessments for the technical team at VIT-AP University's premier tech club.",
+    description: "Supported the technical team in creating automation scripts and dashboards for internal projects.",
     achievements: [
-      "Conducted social engineering simulations to assess and improve organizational security awareness",
-      "Performed Wi-Fi penetration testing during workshops to identify and mitigate vulnerabilities in wireless networks",
-      "Delivered hands-on cybersecurity demonstrations to educate club members on best practices and emerging threats"
+      "Assisted in developing web tools for 100+ participants during awareness programs",
+      "Improved testing efficiency by 30% through documentation and process automation"
     ]
   },
   {
-    title: "Group Leader - Smart Hospital Appointment System",
-    company: "Smart India Hackathon (VIT-AP)",
+    title: "Team Lead – Smart Hospital System",
+    company: "Smart India Hackathon, VIT-AP",
     period: "2023",
-    description: "Led a team to develop an innovative hospital appointment system with RFID integration and real-time tracking capabilities.",
+    description: "Led a team of 5 to build a secure RFID-based appointment system used in mock simulations for 50+ patients.",
     achievements: [
-      "Developed RFID attendance and appointment system for seamless patient management",
-      "Built full stack application using Next.js, MongoDB, and Node.js",
-      "Implemented real-time tracking and notification features for enhanced user experience"
+      "Developed a real-time web app using Next.js, Node.js, and MongoDB with 3-tier architecture",
+      "Implemented role-based access control (RBAC) and authentication for improved data privacy"
     ]
   },
   {
-    title: "Front End Developer",
-    company: "Engineering Clinics (ECS, VIT-AP)",
+    title: "Frontend Developer",
+    company: "Engineering Clinics, VIT-AP University",
     period: "2023",
-    description: "Developed IoT solutions and user interfaces for energy monitoring and management systems.",
+    description: "Developed an IoT-based electricity tracker used in demo labs to monitor 10+ appliances' power usage.",
     achievements: [
-      "Developed an IoT solution to monitor and record real-time electricity consumption of individual appliances",
-      "Created detailed insights dashboard for efficient energy usage tracking",
-      "Designed seamless, user-friendly and dynamic UI for the Electro-Buck Project",
-      "Collaborated with team members to achieve project goals and deliverables"
+      "Built a real-time dashboard with React and integrated Firebase, achieving 1-second sync latency",
+      "Completed MVP delivery 2 weeks ahead of schedule while maintaining 100% functionality coverage"
     ]
   }
 ];
 
 const Experience = () => {
   return (
-    <section id="experience" className="py-20 bg-white dark:bg-gray-900">
+    <section id="experience" className="py-20 bg-transparent dark:bg-gray-900">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -56,7 +52,7 @@ const Experience = () => {
             Professional Experience
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            My journey through cybersecurity analysis, full-stack development, and technical leadership 
+            My journey through cybersecurity analysis, full-stack development, and technical leadership
             in various projects and organizations.
           </p>
         </motion.div>

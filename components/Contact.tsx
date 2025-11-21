@@ -56,7 +56,7 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white dark:bg-gray-900">
+    <section id="contact" className="py-20 bg-transparent dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -86,12 +86,13 @@ const Contact: React.FC = () => {
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Name
               </label>
-              <input
+              <motion.input
                 type="text"
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 rounded-lg border border-primary-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                whileFocus={{ scale: 1.01 }}
                 required
               />
             </div>
@@ -101,12 +102,13 @@ const Contact: React.FC = () => {
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
               </label>
-              <input
+              <motion.input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 rounded-lg border border-primary-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                whileFocus={{ scale: 1.01 }}
                 required
               />
             </div>
@@ -116,12 +118,13 @@ const Contact: React.FC = () => {
               <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Subject (Optional)
               </label>
-              <input
+              <motion.input
                 type="text"
                 id="subject"
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 rounded-lg border border-primary-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                whileFocus={{ scale: 1.01 }}
               />
             </div>
 
@@ -130,20 +133,23 @@ const Contact: React.FC = () => {
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Message
               </label>
-              <textarea
+              <motion.textarea
                 id="message"
                 rows={5}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2 rounded-lg border border-primary-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all"
+                whileFocus={{ scale: 1.01 }}
                 required
               />
             </div>
 
             {/* Submit Button */}
-            <button
+            <motion.button
               type="submit"
               disabled={status === 'submitting'}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
               className="w-full py-3 px-6 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium flex items-center justify-center space-x-2 transition-colors disabled:opacity-70"
             >
               {status === 'submitting' ? (
@@ -157,7 +163,7 @@ const Contact: React.FC = () => {
                   <span>Send Message</span>
                 </>
               )}
-            </button>
+            </motion.button>
 
             {/* Success & Error Feedback */}
             {status === 'success' && (

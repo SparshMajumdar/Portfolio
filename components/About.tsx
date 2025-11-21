@@ -2,15 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Shield, Terminal, GraduationCap } from 'lucide-react';
+import { Code2, Terminal, GraduationCap } from 'lucide-react';
 
 const About = () => {
   const features = [
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Cybersecurity Analysis",
-      description: "Conducting social engineering simulations and Wi-Fi penetration testing to assess organizational security awareness."
-    },
     {
       icon: <Code2 className="w-6 h-6" />,
       title: "Full Stack Development",
@@ -29,7 +24,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white dark:bg-gray-900">
+    <section id="about" className="py-20 bg-transparent dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -41,21 +36,22 @@ const About = () => {
             About Me
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            I'm a passionate cybersecurity analyst and full-stack developer currently pursuing B.Tech in Computer Science 
-            with Business Systems at VIT-AP University. I specialize in security assessments, penetration testing, 
-            and building scalable web applications.
+            Results-driven computer science developer with experience in software and cloud development.
+            Experienced in designing and deploying scalable web applications using Next.js, Node.js, React, and AWS,
+            with a focus on delivering efficient, secure, and user-friendly solutions.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
               transition={{ delay: index * 0.2 }}
-              className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg hover:shadow-lg transition-shadow"
+              className="bg-white/60 dark:bg-gray-800 p-6 rounded-lg hover:shadow-xl transition-shadow duration-300 backdrop-blur-sm border border-primary-100 dark:border-gray-700"
             >
               <div className="text-primary-500 mb-4">
                 {feature.icon}

@@ -64,8 +64,8 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ['Share Tech Mono', 'monospace'],
-        mono: ['Share Tech Mono', 'monospace'],
+        sans: ['var(--font-vt323)', 'monospace'],
+        mono: ['var(--font-vt323)', 'monospace'],
       },
       spacing: {
         '18': '4.5rem',
@@ -93,11 +93,11 @@ const config: Config = {
           '100%': { transform: 'translateY(-100%)' },
         },
         'pulse-green': {
-          '0%, 100%': { 
+          '0%, 100%': {
             boxShadow: '0 0 5px rgba(0, 255, 140, 0.5)',
             textShadow: '0 0 5px rgba(0, 255, 140, 0.5)'
           },
-          '50%': { 
+          '50%': {
             boxShadow: '0 0 20px rgba(0, 255, 140, 0.8)',
             textShadow: '0 0 15px rgba(0, 255, 140, 0.8)'
           },

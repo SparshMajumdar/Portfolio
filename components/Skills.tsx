@@ -1,97 +1,101 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const Skills = () => {
+  const targetRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+  });
+
+  const x = useTransform(scrollYProgress, [0, 1], ["1%", "-75%"]);
+
   const skillCategories = [
     {
-      title: "Programming Languages",
+      title: "Programming",
       skills: [
-        { name: "Python"},
-        { name: "JavaScript"},
-        { name: "C/C++"},
-        { name: "HTML/CSS" },
-        { name: "SQL/Postgres" },
-        { name: "R" }
+        { name: "C/C++" },
+        { name: "Python" },
+        { name: "JavaScript" },
+        { name: "SQL" },
+        { name: "HTML/CSS" }
       ]
     },
     {
-      title: "Frameworks & Tools",
+      title: "Frameworks",
       skills: [
         { name: "React" },
-        { name: "Node.js" },
         { name: "Next.js" },
-        { name: "Flask" },
-        { name: "OSINT" }
+        { name: "Node.js" },
+        { name: "Flask" }
       ]
     },
     {
-      title: "Developer Tools & Libraries",
+      title: "Cloud & Databases",
       skills: [
-        { name: "Git"},
-        { name: "VS Code"},
-        { name: "Kali Linux"},
-        { name: "Burpsuite"},
-        { name: "Metasploit"},
-        { name: "Wireshark"},
-        { name: "Cisco Packet Tracer"}
+        { name: "AWS (EC2, S3, Lambda)" },
+        { name: "MongoDB Atlas" },
+        { name: "Firebase" },
+        { name: "CloudWatch" }
       ]
     },
     {
-      title: "Libraries & Automation",
+      title: "Tools & Libraries",
       skills: [
-        { name: "pandas"},
-        { name: "NumPy"},
-        { name: "Matplotlib"},
-        { name: "Selenium"},
-        { name: "Beautiful Soup"}
+        { name: "Git" },
+        { name: "Docker" },
+        { name: "Power BI" },
+        { name: "Pandas/NumPy" },
+        { name: "Selenium" }
       ]
     }
   ];
 
   return (
-    <section id="skills" className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Technical Skills
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A comprehensive overview of my technical expertise across programming languages, 
-            frameworks, cybersecurity tools, and development environments.
-          </p>
-        </motion.div>
+    <section ref={targetRef} id="skills" className="relative h-[300vh] bg-transparent dark:bg-gray-900">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 absolute top-10 left-0 right-0 z-10"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Technical Skills
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              A comprehensive overview of my technical expertise across programming languages,
+              frameworks, cloud technologies, and development tools.
+            </p>
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {skillCategories.map((category, categoryIndex) => (
-            <motion.div
-              key={categoryIndex}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: categoryIndex * 0.2 }}
-              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                {category.title}
-              </h3>
-              <div className="space-y-4">
-                {category.skills.map((skill, skillIndex) => (
-                  <div key={skillIndex}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-gray-700 dark:text-gray-300">{skill.name}</span>
+          <motion.div style={{ x }} className="flex gap-8 pl-4 md:pl-20">
+            {skillCategories.map((category, categoryIndex) => (
+              <div
+                key={categoryIndex}
+                className="min-w-[300px] md:min-w-[400px] bg-white/60 dark:bg-gray-800 p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-primary-100 dark:border-gray-700 flex flex-col justify-center"
+              >
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                  {category.title}
+                </h3>
+                <div className="space-y-4">
+                  {category.skills.map((skill, skillIndex) => (
+                    <div
+                      key={skillIndex}
+                      className="flex items-center space-x-3 group"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-primary-500 group-hover:scale-150 transition-transform duration-300" />
+                      <span className="text-lg text-gray-700 dark:text-gray-300 group-hover:text-primary-500 transition-colors duration-300 font-medium">
+                        {skill.name}
+                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </motion.div>
-          ))}
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

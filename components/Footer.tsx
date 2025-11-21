@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-950 dark:to-primary-900 text-primary-950 dark:text-white py-12">
+    <footer className="bg-transparent dark:bg-gradient-to-br dark:from-primary-950 dark:to-primary-900 text-primary-950 dark:text-white py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
           <motion.button
@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
               <Github size={20} />
             </a>
             <a
-              href="https://www.linkedin.com/in/sparsh-majumdar-03820b288/"
+              href="https://linkedin.com/in/sparsh-majumdar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white transition-colors"

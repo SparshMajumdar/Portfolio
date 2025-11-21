@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, Moon, Sun, Github, Linkedin, Mail } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,12 +26,11 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/80 dark:bg-gray-950/80 backdrop-blur-md py-3 shadow-sm' 
-          : 'bg-transparent py-5'
-      }`}
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? 'bg-primary-50/90 dark:bg-gray-950/80 backdrop-blur-md py-3 shadow-sm'
+        : 'bg-transparent py-5'
+        }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <div /> {/* ✅ Empty div replaces logo or text */}
@@ -47,13 +44,20 @@ const Header: React.FC = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
+                className="relative"
               >
-                <a 
+                <a
                   href={link.href}
-                  className="text-sm font-medium text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white transition-colors"
+                  className="text-sm font-medium text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white transition-colors relative z-10"
                 >
                   {link.name}
                 </a>
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
               </motion.li>
             ))}
           </ul>
@@ -84,25 +88,11 @@ const Header: React.FC = () => {
             >
               <Mail size={20} />
             </motion.a>
-            <motion.button
-              onClick={toggleTheme}
-              whileHover={{ scale: 1.1 }}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </motion.button>
           </div>
         </nav>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden space-x-4">
-          <motion.button
-            onClick={toggleTheme}
-            whileHover={{ scale: 1.1 }}
-            className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </motion.button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-gray-700 dark:text-white"
@@ -118,13 +108,13 @@ const Header: React.FC = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-white dark:bg-gray-900 shadow-lg"
+          className="md:hidden bg-primary-50 dark:bg-gray-900 shadow-lg"
         >
           <div className="container mx-auto px-4 py-4">
             <ul className="space-y-4">
               {navLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <a
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className="block py-2 text-base font-medium text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-white"
