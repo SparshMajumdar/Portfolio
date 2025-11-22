@@ -1,10 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail, Download, ArrowRight } from 'lucide-react';
 
 const Hero: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-gray-950 via-primary-950 to-gray-900">
       {/* Animated Background Grid */}
@@ -18,7 +24,7 @@ const Hero: React.FC = () => {
 
       {/* Floating Particles - Client Side Only */}
       <div className="absolute inset-0 overflow-hidden">
-        {typeof window !== 'undefined' && [...Array(20)].map((_, i) => (
+        {mounted && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-primary-500 rounded-full"
@@ -42,31 +48,31 @@ const Hero: React.FC = () => {
         ))}
       </div>
 
-      <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 sm:px-6 py-12 md:py-16 lg:py-24 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Left Column - Content */}
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="space-y-4"
+              className="space-y-3 md:space-y-4"
             >
-              <div className="inline-block px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full backdrop-blur-sm">
-                <span className="text-primary-400 text-sm font-medium">👋 Welcome to my portfolio</span>
+              <div className="inline-block px-3 py-1.5 md:px-4 md:py-2 bg-primary-500/10 border border-primary-500/30 rounded-full backdrop-blur-sm">
+                <span className="text-primary-400 text-xs md:text-sm font-medium">👋 Welcome to my portfolio</span>
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-white via-primary-300 to-primary-500 bg-clip-text text-transparent">
                   Hi, I'm Sparsh
                 </span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-gray-400">
-                Computer Science Developer
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-400">
+                Full Stack Developer
               </p>
 
-              <p className="text-gray-500 text-lg max-w-xl">
+              <p className="text-gray-500 text-base md:text-lg max-w-xl">
                 Crafting innovative solutions with modern technologies. Specializing in full-stack development, cloud architecture, and creating seamless user experiences.
               </p>
             </motion.div>
@@ -76,24 +82,24 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-wrap gap-4"
+              className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-4"
             >
               <a
                 href="/Sparsh_Resume.pdf"
                 download
-                className="group relative inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-gray-900 font-bold rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105"
+                className="group relative inline-flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-primary-500 text-gray-900 font-bold rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105 text-sm md:text-base"
               >
                 <span className="relative z-10">Download Resume</span>
-                <Download className="w-5 h-5 relative z-10" />
+                <Download className="w-4 h-4 md:w-5 md:h-5 relative z-10" />
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity" />
               </a>
 
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 px-8 py-4 border-2 border-primary-500 text-primary-400 font-bold rounded-full hover:bg-primary-500/10 transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 border-2 border-primary-500 text-primary-400 font-bold rounded-full hover:bg-primary-500/10 transition-all duration-300 text-sm md:text-base"
               >
                 Get in Touch
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
               </a>
             </motion.div>
 
@@ -102,42 +108,42 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex items-center gap-4 pt-4"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 pt-2 md:pt-4"
             >
-              <span className="text-gray-500 text-sm">Connect:</span>
-              <div className="flex gap-3">
+              <span className="text-gray-500 text-xs md:text-sm">Connect:</span>
+              <div className="flex gap-2 md:gap-3">
                 <a
                   href="https://github.com/SparshMajumdar"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
+                  className="p-2.5 md:p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
                 >
-                  <Github className="w-5 h-5 text-gray-400 group-hover:text-primary-400" />
+                  <Github className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-primary-400" />
                 </a>
                 <a
                   href="https://linkedin.com/in/sparsh-majumdar"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
+                  className="p-2.5 md:p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
                 >
-                  <Linkedin className="w-5 h-5 text-gray-400 group-hover:text-primary-400" />
+                  <Linkedin className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-primary-400" />
                 </a>
                 <a
                   href="mailto:sparshmajumdar04@gmail.com"
-                  className="p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
+                  className="p-2.5 md:p-3 bg-gray-800 hover:bg-primary-500/20 border border-gray-700 hover:border-primary-500 rounded-lg transition-all duration-300 group"
                 >
-                  <Mail className="w-5 h-5 text-gray-400 group-hover:text-primary-400" />
+                  <Mail className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-primary-400" />
                 </a>
               </div>
             </motion.div>
           </div>
 
-          {/* Right Column - 3D Visual Elements */}
+          {/* Right Column - 3D Visual Elements - Hidden on Mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative h-[600px] hidden lg:block"
+            className="relative h-[400px] md:h-[500px] lg:h-[600px] hidden md:block"
           >
             {/* Central Glowing Orb */}
             <motion.div
