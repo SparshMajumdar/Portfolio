@@ -9,8 +9,8 @@ const vt323 = VT323({
 });
 
 export const metadata = {
-  title: 'Sparsh Majumdar | Cybersecurity & Development',
-  description: 'Portfolio of Sparsh Majumdar - Cybersecurity Specialist & Full Stack Developer',
+  title: 'Sparsh Majumdar | Full Stack Developer',
+  description: 'Portfolio of Sparsh Majumdar - Full Stack Developer',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
