@@ -61,7 +61,7 @@ const featuredProjects = [
     date: "2026",
     icon: "shield",
     link: null,
-    github: "https://github.com/your-username/cloud-misconfig-scanner",
+    github: "https://github.com/SparshMajumdar/Cloudmisconfiguration",
   },
   {
     title: "Electro Buck — IoT Monitor",
