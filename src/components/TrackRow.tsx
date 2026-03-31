@@ -23,33 +23,26 @@ export default function TrackRow({
   github,
 }: TrackRowProps) {
 
-  const handleRowClick = () => {
+  const handlePlayClick = () => {
     if (link) {
       window.open(link, "_blank", "noopener,noreferrer");
     }
   };
 
   return (
-    <div
-      onClick={handleRowClick}
-      role={link ? "link" : undefined}
-      tabIndex={link ? 0 : undefined}
-      onKeyDown={(event) => {
-        if (link && (event.key === "Enter" || event.key === " ")) {
-          event.preventDefault();
-          handleRowClick();
-        }
-      }}
-      className="track-row flex items-center px-4 py-3 rounded-lg hover:bg-surface-container-highest transition-all group cursor-pointer"
-    >
+    <div className="track-row flex items-center px-4 py-3 rounded-lg hover:bg-surface-container-highest transition-all group">
       {/* Index / Play */}
       <div className="w-10 text-on-surface-variant group-hover:text-transparent relative flex items-center">
-        <span
-          className="track-play hidden material-symbols-outlined text-primary absolute scale-90"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          play_arrow
-        </span>
+        {link && (
+          <button
+            onClick={handlePlayClick}
+            className="track-play hidden material-symbols-outlined text-primary absolute scale-90 hover:scale-100 transition-transform cursor-pointer"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+            aria-label={`Open project: ${title}`}
+          >
+            play_arrow
+          </button>
+        )}
       </div>
 
       {/* Title + Description */}
@@ -60,7 +53,7 @@ export default function TrackRow({
           </span>
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-on-surface font-semibold truncate group-hover:text-primary transition-colors">
+          <span className="text-on-surface font-semibold truncate">
             {title}
           </span>
           <span className="text-xs text-on-surface-variant truncate">
