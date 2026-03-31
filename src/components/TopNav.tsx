@@ -30,12 +30,18 @@ export default function TopNav() {
       {/* Left: Nav Buttons + Links */}
       <div className="flex items-center gap-4">
         <div className="flex gap-2">
-          <button className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center hover:opacity-80 transition-all">
+          <button
+            onClick={() => window.history.back()}
+            className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center hover:opacity-80 transition-all"
+          >
             <span className="material-symbols-outlined text-sm">
               chevron_left
             </span>
           </button>
-          <button className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center hover:opacity-80 transition-all">
+          <button
+            onClick={() => window.history.forward()}
+            className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center hover:opacity-80 transition-all"
+          >
             <span className="material-symbols-outlined text-sm">
               chevron_right
             </span>
