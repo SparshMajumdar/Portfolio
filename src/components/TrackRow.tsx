@@ -1,4 +1,4 @@
-import Link from "next/link";
+"use client";
 
 interface TrackRowProps {
   index: number;
@@ -13,7 +13,6 @@ interface TrackRowProps {
 }
 
 export default function TrackRow({
-  index,
   title,
   description,
   stack,
@@ -23,13 +22,28 @@ export default function TrackRow({
   link,
   github,
 }: TrackRowProps) {
-  const displayIndex = index < 10 ? `0${index}` : `${index}`;
+
+  const handleRowClick = () => {
+    if (link) {
+      window.open(link, "_blank", "noopener,noreferrer");
+    }
+  };
 
   return (
-    <div className="track-row flex items-center px-4 py-3 rounded-lg hover:bg-surface-container-highest transition-all group cursor-pointer">
+    <div
+      onClick={handleRowClick}
+      role={link ? "link" : undefined}
+      tabIndex={link ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (link && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          handleRowClick();
+        }
+      }}
+      className="track-row flex items-center px-4 py-3 rounded-lg hover:bg-surface-container-highest transition-all group cursor-pointer"
+    >
       {/* Index / Play */}
       <div className="w-10 text-on-surface-variant group-hover:text-transparent relative flex items-center">
-        <span className="track-index text-sm font-medium">{displayIndex}</span>
         <span
           className="track-play hidden material-symbols-outlined text-primary absolute scale-90"
           style={{ fontVariationSettings: "'FILL' 1" }}
@@ -65,14 +79,14 @@ export default function TrackRow({
         {date}
       </div>
 
-      {/* GitHub lyrics icon link (optional) */}
-      {github && (
-        <div className="w-14 flex justify-end">
+      {/* Lyrics / GitHub icon column */}
+      <div className="w-24 text-right">
+        {github ? (
           <a
             href={github}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center text-on-surface-variant hover:text-primary"
+            className="inline-flex items-center justify-end text-on-surface-variant hover:text-primary"
             aria-label={`Open source code for ${title}`}
           >
             <span
@@ -82,27 +96,10 @@ export default function TrackRow({
               lyrics
             </span>
           </a>
-        </div>
-      )}
-
-      {/* Play link (optional) */}
-      {link && (
-        <div className="w-20 text-right">
-          <Link
-            href={link}
-            className="inline-flex items-center justify-end gap-1 text-primary text-sm font-semibold hover:text-primary-container"
-            aria-label={`Open project ${title}`}
-          >
-            <span
-              className="material-symbols-outlined"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              play_arrow
-            </span>
-            Open
-          </Link>
-        </div>
-      )}
+        ) : (
+          <span className="text-on-surface-variant text-sm">—</span>
+        )}
+      </div>
 
       {/* Duration (optional) */}
       {duration && (

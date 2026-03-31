@@ -26,7 +26,7 @@ export default function TopNav() {
   }, [showProfileMenu]);
 
   return (
-    <header className="fixed top-0 right-0 left-64 h-16 flex justify-between items-center px-8 z-30 bg-surface/80 backdrop-blur-sm">
+    <header className="fixed top-0 right-0 left-0 md:left-64 h-16 flex justify-between items-center px-4 md:px-8 z-30 bg-surface/80 backdrop-blur-sm">
       {/* Left: Nav Buttons + Links */}
       <div className="flex items-center gap-4">
         <div className="flex gap-2">
@@ -124,6 +124,7 @@ export default function TopNav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-highest"
+                  onClick={() => setShowProfileMenu(false)}
                 >
                   Download Resume
                 </a>

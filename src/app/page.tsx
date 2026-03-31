@@ -171,6 +171,7 @@ export default function HomePage() {
             <div className="flex-1">Title</div>
             <div className="w-1/4">Stack</div>
             <div className="w-24 text-right">Released</div>
+            <div className="w-24 text-right">Lyrics</div>
           </div>
 
           {/* Project Rows */}

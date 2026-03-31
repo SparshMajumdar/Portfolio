@@ -23,7 +23,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <Sidebar />
-        <main className="ml-64 flex-1 h-screen overflow-y-auto custom-scrollbar relative bg-surface pb-32">
+        <main className="ml-0 md:ml-64 flex-1 h-screen overflow-y-auto custom-scrollbar relative bg-surface pb-32">
           <TopNav />
           {children}
         </main>
