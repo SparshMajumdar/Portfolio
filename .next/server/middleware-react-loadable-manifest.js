@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"app\\\\page.tsx -> @/components/book/BookScene\":{\"id\":\"app\\\\page.tsx -> @/components/book/BookScene\",\"files\":[\"static/chunks/_app-pages-browser_src_components_book_BookScene_tsx.js\"]}}"
