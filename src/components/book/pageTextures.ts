@@ -14,6 +14,14 @@ import { resumeData } from "@/data/resumeData";
 const CANVAS_WIDTH = 1536;
 const CANVAS_HEIGHT = 2240;
 
+function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.innerWidth < 768 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  );
+}
+
 let paperNoisePatternCache: CanvasPattern | null = null;
 
 function applyPaperGrainNoise(
@@ -105,7 +113,7 @@ function drawPaperBackground(ctx: CanvasRenderingContext2D, isLeftPage: boolean)
   }
 }
 
-// Text wrapping utility
+// Robust text wrapping utility supporting paragraphs, newlines, trimming, and alignment
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -114,23 +122,31 @@ function wrapText(
   maxWidth: number,
   lineHeight: number
 ): number {
-  const words = text.split(" ");
-  let line = "";
+  if (!text) return startY;
+  const paragraphs = text.split("\n");
   let y = startY;
 
-  for (let i = 0; i < words.length; i++) {
-    const testLine = line + words[i] + " ";
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && i > 0) {
+  for (let p = 0; p < paragraphs.length; p++) {
+    const words = paragraphs[p].split(" ");
+    let line = "";
+
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line ? line + " " + words[i] : words[i];
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && line.length > 0) {
+        ctx.fillText(line.trim(), x, y);
+        line = words[i];
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.length > 0) {
       ctx.fillText(line.trim(), x, y);
-      line = words[i] + " ";
       y += lineHeight;
-    } else {
-      line = testLine;
     }
   }
-  ctx.fillText(line.trim(), x, y);
-  return y + lineHeight;
+  return y;
 }
 
 // Left Page Chapter Title Template (Consistent across all chapters)
@@ -176,24 +192,32 @@ function renderChapterTitlePage(
   ctx.lineTo(padLeft + 110, centerY + 36);
   ctx.stroke();
 
-  // Chapter Title in Large Serif
-  ctx.font = "700 102px 'Playfair Display', Georgia, serif";
+  // Chapter Title in Large Serif - dynamically sized so it never overflows contentW or runs into spine
+  let titleSize = 92;
+  ctx.font = `700 ${titleSize}px 'Playfair Display', Georgia, serif`;
   ctx.letterSpacing = "1px";
   ctx.fillStyle = "#181614";
   ctx.textBaseline = "top";
 
-  const titleLines = title.split("\n");
+  const rawLines = title.split("\n");
+  rawLines.forEach((rLine) => {
+    while (ctx.measureText(rLine).width > contentW && titleSize > 56) {
+      titleSize -= 4;
+      ctx.font = `700 ${titleSize}px 'Playfair Display', Georgia, serif`;
+    }
+  });
+
   let curY = centerY + 80;
-  titleLines.forEach((tLine) => {
+  rawLines.forEach((tLine) => {
     ctx.fillText(tLine, padLeft, curY);
-    curY += 114;
+    curY += titleSize * 1.15;
   });
 
   // Short Subtitle / Introductory Phrase
-  ctx.font = "italic 400 44px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 400 42px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#4A453E";
   ctx.letterSpacing = "0.5px";
-  wrapText(ctx, subtitle, padLeft, curY + 32, contentW, 60);
+  wrapText(ctx, subtitle, padLeft, curY + 28, contentW, 56);
 
   // Minimal Geometric Ornament
   const ornamentY = 1520;
@@ -275,27 +299,32 @@ function renderSpread0Right(ctx: CanvasRenderingContext2D) {
   ctx.lineTo(centerX + 45, 545);
   ctx.stroke();
 
-  // Name: SPARSH MAJUMDAR (Main visual focus, large, elegant serif)
-  ctx.font = "700 120px 'Playfair Display', Georgia, serif";
+  // Name: SPARSH MAJUMDAR (dynamically fitted so it never exceeds contentW)
+  let nameSize = 96;
+  ctx.font = `700 ${nameSize}px 'Playfair Display', Georgia, serif`;
   ctx.letterSpacing = "2px";
+  while (ctx.measureText("SPARSH MAJUMDAR").width > contentW - 40 && nameSize > 60) {
+    nameSize -= 4;
+    ctx.font = `700 ${nameSize}px 'Playfair Display', Georgia, serif`;
+  }
   ctx.fillStyle = "#161412";
   ctx.fillText("SPARSH MAJUMDAR", centerX, 610);
 
   // Subtitle: Interactive Resume & Portfolio
-  ctx.font = "400 42px 'Inter', sans-serif";
-  ctx.letterSpacing = "3px";
+  ctx.font = "400 40px 'Inter', sans-serif";
+  ctx.letterSpacing = "2px";
   ctx.fillStyle = "#5E564B";
-  ctx.fillText("Interactive Resume & Portfolio", centerX, 770);
+  ctx.fillText("Interactive Resume & Portfolio", centerX, 760);
 
   // Subtle decorative divider
   ctx.fillStyle = "#C2B7A6";
   ctx.font = "30px 'Playfair Display', serif";
-  ctx.fillText("✦   ◆   ✦", centerX, 890);
+  ctx.fillText("✦   ◆   ✦", centerX, 880);
 
   // Quote: "Every experience tells a story. This is mine."
-  ctx.font = "italic 400 46px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 400 44px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#332F2A";
-  ctx.fillText("“Every experience tells a story. This is mine.”", centerX, 990);
+  wrapText(ctx, "“Every experience tells a story. This is mine.”", centerX, 980, contentW - 40, 56);
 
   // Page Number at Bottom
   ctx.font = "600 28px 'Playfair Display', Georgia, serif";
@@ -443,7 +472,7 @@ function renderSpread1Right(ctx: CanvasRenderingContext2D) {
   // Short Note at Bottom of TOC
   ctx.font = "italic 400 30px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#6E665A";
-  ctx.fillText("Click any entry to jump directly to that chapter.", padLeft, entryY + 40);
+  wrapText(ctx, "Click any entry to jump directly to that chapter.", padLeft, entryY + 40, contentW, 40);
 
   // Page Number at Bottom
   ctx.font = "600 28px 'Playfair Display', Georgia, serif";
@@ -497,7 +526,7 @@ function renderSpread2Right(ctx: CanvasRenderingContext2D) {
   ctx.font = "400 38px 'Inter', sans-serif";
   ctx.fillStyle = "#221F1C";
   curY = wrapText(ctx, data.professionalSummary, padLeft, curY, contentW, 56);
-  curY += 36;
+  curY += 32;
 
   // Section 2: Career Interests
   ctx.font = "600 28px 'JetBrains Mono', monospace";
@@ -507,12 +536,12 @@ function renderSpread2Right(ctx: CanvasRenderingContext2D) {
   curY += 46;
 
   data.careerInterests.forEach((item) => {
-    ctx.font = "400 34px 'Inter', sans-serif";
+    ctx.font = "400 32px 'Inter', sans-serif";
     ctx.fillStyle = "#332F2A";
-    ctx.fillText("— " + item, padLeft + 10, curY);
-    curY += 48;
+    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 44);
+    curY += 8;
   });
-  curY += 36;
+  curY += 28;
 
   // Section 3: Technical Interests
   ctx.font = "600 28px 'JetBrains Mono', monospace";
@@ -522,12 +551,12 @@ function renderSpread2Right(ctx: CanvasRenderingContext2D) {
   curY += 46;
 
   data.technicalInterests.forEach((item) => {
-    ctx.font = "400 34px 'Inter', sans-serif";
+    ctx.font = "400 32px 'Inter', sans-serif";
     ctx.fillStyle = "#332F2A";
-    ctx.fillText("— " + item, padLeft + 10, curY);
-    curY += 48;
+    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 44);
+    curY += 8;
   });
-  curY += 36;
+  curY += 28;
 
   // Section 4: Professional Goals
   ctx.font = "600 28px 'JetBrains Mono', monospace";
@@ -537,10 +566,10 @@ function renderSpread2Right(ctx: CanvasRenderingContext2D) {
   curY += 46;
 
   data.professionalGoals.forEach((item) => {
-    ctx.font = "400 34px 'Inter', sans-serif";
+    ctx.font = "400 32px 'Inter', sans-serif";
     ctx.fillStyle = "#332F2A";
-    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 48);
-    curY += 12;
+    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 44);
+    curY += 8;
   });
 
   // Page Number at Bottom
@@ -592,20 +621,20 @@ function renderSpread3Right(ctx: CanvasRenderingContext2D) {
   ctx.fillText("DEGREE & INSTITUTION", padLeft, curY);
   curY += 46;
 
-  ctx.font = "700 54px 'Playfair Display', Georgia, serif";
+  ctx.font = "700 52px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#181614";
-  curY = wrapText(ctx, data.degree, padLeft, curY, contentW, 66);
-  curY += 12;
+  curY = wrapText(ctx, data.degree, padLeft, curY, contentW, 64);
+  curY += 10;
 
-  ctx.font = "600 40px 'Inter', sans-serif";
+  ctx.font = "600 38px 'Inter', sans-serif";
   ctx.fillStyle = "#3E3831";
   ctx.fillText(data.institution, padLeft, curY);
-  curY += 52;
+  curY += 50;
 
-  ctx.font = "400 30px 'JetBrains Mono', monospace";
+  ctx.font = "400 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
-  ctx.fillText(`${data.period}  •  ${data.graduationYear}  •  ${data.location}`, padLeft, curY);
-  curY += 66;
+  curY = wrapText(ctx, `${data.period}  •  ${data.graduationYear}  •  ${data.location}`, padLeft, curY, contentW, 36);
+  curY += 48;
 
   // Thin separator
   ctx.strokeStyle = "#E4DCD0";
@@ -624,12 +653,12 @@ function renderSpread3Right(ctx: CanvasRenderingContext2D) {
   curY += 46;
 
   data.focusAreas.forEach((item) => {
-    ctx.font = "400 34px 'Inter', sans-serif";
+    ctx.font = "400 32px 'Inter', sans-serif";
     ctx.fillStyle = "#262320";
-    ctx.fillText("— " + item, padLeft + 10, curY);
-    curY += 48;
+    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 44);
+    curY += 8;
   });
-  curY += 44;
+  curY += 36;
 
   // Academic Highlights
   ctx.font = "600 28px 'JetBrains Mono', monospace";
@@ -639,10 +668,10 @@ function renderSpread3Right(ctx: CanvasRenderingContext2D) {
   curY += 46;
 
   data.academicHighlights.forEach((item) => {
-    ctx.font = "400 34px 'Inter', sans-serif";
+    ctx.font = "400 32px 'Inter', sans-serif";
     ctx.fillStyle = "#262320";
-    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 48);
-    curY += 14;
+    curY = wrapText(ctx, "— " + item, padLeft + 10, curY, contentW - 20, 44);
+    curY += 8;
   });
 
   // Page Number at Bottom
@@ -689,40 +718,40 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
 
   // Project A
   const projA = items[0];
-  ctx.font = "700 48px 'Playfair Display', Georgia, serif";
+  ctx.font = "700 46px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#181614";
   ctx.fillText(projA.title, padLeft, curY);
-  curY += 56;
+  curY += 54;
 
-  ctx.font = "italic 400 32px 'Playfair Display', serif";
+  ctx.font = "italic 400 30px 'Playfair Display', serif";
   ctx.fillStyle = "#A85324";
   ctx.fillText(projA.subtitle, padLeft, curY);
-  curY += 44;
+  curY += 42;
 
-  ctx.font = "400 33px 'Inter', sans-serif";
+  ctx.font = "400 32px 'Inter', sans-serif";
   ctx.fillStyle = "#2E2A25";
-  curY = wrapText(ctx, projA.overview, padLeft, curY, contentW, 46);
-  curY += 18;
+  curY = wrapText(ctx, projA.overview, padLeft, curY, contentW, 44);
+  curY += 16;
 
   if (projA.problemStatement) {
     ctx.font = "600 26px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#6E665A";
     ctx.fillText("PROBLEM STATEMENT:", padLeft, curY);
     curY += 34;
-    ctx.font = "400 31px 'Inter', sans-serif";
+    ctx.font = "400 30px 'Inter', sans-serif";
     ctx.fillStyle = "#3E3932";
-    curY = wrapText(ctx, projA.problemStatement, padLeft, curY, contentW, 44);
-    curY += 18;
+    curY = wrapText(ctx, projA.problemStatement, padLeft, curY, contentW, 42);
+    curY += 16;
   }
 
   ctx.font = "600 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
   ctx.fillText("TECHNOLOGIES & SERVICES:", padLeft, curY);
   curY += 34;
-  ctx.font = "500 28px 'JetBrains Mono', monospace";
+  ctx.font = "500 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#221F1C";
-  ctx.fillText(projA.technologies.join("  •  "), padLeft, curY);
-  curY += 44;
+  curY = wrapText(ctx, projA.technologies.join("  •  "), padLeft, curY, contentW, 36);
+  curY += 16;
 
   ctx.font = "600 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
@@ -731,14 +760,14 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
   projA.keyFeatures.forEach((feat) => {
     ctx.font = "400 30px 'Inter', sans-serif";
     ctx.fillStyle = "#332F2A";
-    ctx.fillText("— " + feat, padLeft + 10, curY);
-    curY += 40;
+    curY = wrapText(ctx, "— " + feat, padLeft + 10, curY, contentW - 20, 40);
+    curY += 6;
   });
   curY += 14;
 
   // Project A Interactive Repository Button
   const projABtnY = Math.max(curY + 14, 880);
-  const btnW = 440;
+  const btnW = 420;
   const btnH = 64;
 
   ctx.fillStyle = "#A85324";
@@ -749,10 +778,10 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = "center";
   ctx.fillText("VIEW ON GITHUB ↗", padLeft + btnW / 2, projABtnY + 22);
 
-  ctx.font = "400 24px 'JetBrains Mono', monospace";
+  ctx.font = "400 22px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
   ctx.textAlign = "left";
-  ctx.fillText(projA.githubUrl.replace("https://", ""), padLeft + btnW + 28, projABtnY + 22);
+  ctx.fillText(projA.githubUrl.replace("https://", ""), padLeft + btnW + 24, projABtnY + 22);
 
   curY = projABtnY + btnH + 34;
 
@@ -763,33 +792,33 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
   ctx.moveTo(padLeft, curY);
   ctx.lineTo(padLeft + contentW, curY);
   ctx.stroke();
-  curY += 38;
+  curY += 36;
 
   // Project B
   const projB = items[1];
-  ctx.font = "700 48px 'Playfair Display', Georgia, serif";
+  ctx.font = "700 46px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#181614";
   ctx.fillText(projB.title, padLeft, curY);
-  curY += 56;
+  curY += 54;
 
-  ctx.font = "italic 400 32px 'Playfair Display', serif";
+  ctx.font = "italic 400 30px 'Playfair Display', serif";
   ctx.fillStyle = "#A85324";
   ctx.fillText(projB.subtitle, padLeft, curY);
-  curY += 44;
+  curY += 42;
 
-  ctx.font = "400 33px 'Inter', sans-serif";
+  ctx.font = "400 32px 'Inter', sans-serif";
   ctx.fillStyle = "#2E2A25";
-  curY = wrapText(ctx, projB.overview, padLeft, curY, contentW, 46);
-  curY += 18;
+  curY = wrapText(ctx, projB.overview, padLeft, curY, contentW, 44);
+  curY += 16;
 
   ctx.font = "600 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
   ctx.fillText("TECHNOLOGIES:", padLeft, curY);
   curY += 34;
-  ctx.font = "500 28px 'JetBrains Mono', monospace";
+  ctx.font = "500 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#221F1C";
-  ctx.fillText(projB.technologies.join("  •  "), padLeft, curY);
-  curY += 44;
+  curY = wrapText(ctx, projB.technologies.join("  •  "), padLeft, curY, contentW, 36);
+  curY += 16;
 
   ctx.font = "600 26px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
@@ -798,14 +827,14 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
   projB.keyFeatures.forEach((feat) => {
     ctx.font = "400 30px 'Inter', sans-serif";
     ctx.fillStyle = "#332F2A";
-    ctx.fillText("— " + feat, padLeft + 10, curY);
-    curY += 40;
+    curY = wrapText(ctx, "— " + feat, padLeft + 10, curY, contentW - 20, 40);
+    curY += 6;
   });
   curY += 14;
 
   // Project B Interactive Repository Button
   const projBBtnY = Math.max(curY + 14, 1540);
-  const btnBW = 440;
+  const btnBW = 420;
   const btnBH = 64;
 
   ctx.fillStyle = "#A85324";
@@ -816,10 +845,10 @@ function renderSpread4Right(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = "center";
   ctx.fillText("VIEW ON GITHUB ↗", padLeft + btnBW / 2, projBBtnY + 22);
 
-  ctx.font = "400 24px 'JetBrains Mono', monospace";
+  ctx.font = "400 22px 'JetBrains Mono', monospace";
   ctx.fillStyle = "#6E665A";
   ctx.textAlign = "left";
-  ctx.fillText(projB.githubUrl.replace("https://", ""), padLeft + btnBW + 28, projBBtnY + 22);
+  ctx.fillText(projB.githubUrl.replace("https://", ""), padLeft + btnBW + 24, projBBtnY + 22);
 
   // Page Number at Bottom
   ctx.font = "600 28px 'Playfair Display', Georgia, serif";
@@ -890,10 +919,13 @@ function renderSpread5Right(ctx: CanvasRenderingContext2D) {
   // Understated footnote
   ctx.font = "italic 400 28px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#6E665A";
-  ctx.fillText(
+  wrapText(
+    ctx,
     "Proficiencies verified through production projects, certifications, and systems coursework.",
     padLeft,
-    curY + 20
+    curY + 20,
+    contentW,
+    38
   );
 
   // Page Number at Bottom
@@ -976,15 +1008,15 @@ function renderSpread6Right(ctx: CanvasRenderingContext2D) {
     ctx.textAlign = "left";
     ctx.fillText(c.label, padLeft, itemY);
 
-    // Value
-    ctx.font = "600 38px 'Inter', sans-serif";
+    // Value (sized safely to 30px so it never collides with the button)
+    ctx.font = "600 30px 'Inter', sans-serif";
     ctx.letterSpacing = "0px";
     ctx.fillStyle = "#181614";
     ctx.fillText(c.value, padLeft, itemY + 38);
 
     // Clickable Action Badge / Button on the right side
     if (c.buttonText) {
-      const badgeW = 270;
+      const badgeW = 260;
       const badgeH = 52;
       const badgeX = padLeft + contentW - badgeW;
       const badgeY = itemY + 28;
@@ -1009,10 +1041,17 @@ function renderSpread6Right(ctx: CanvasRenderingContext2D) {
   });
 
   // Short Note at Bottom of Contact Page
-  ctx.font = "italic 400 30px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 400 28px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#6E665A";
   ctx.textAlign = "left";
-  ctx.fillText("Click any channel above to connect or send a message directly.", padLeft, contactStartY + contactItems.length * itemHeight + 36);
+  wrapText(
+    ctx,
+    "Click any channel above to connect or send a message directly.",
+    padLeft,
+    contactStartY + contactItems.length * itemHeight + 36,
+    contentW,
+    38
+  );
 
   // Page Number at Bottom
   ctx.font = "600 28px 'Playfair Display', Georgia, serif";
@@ -1103,20 +1142,34 @@ function renderSpread7Right(ctx: CanvasRenderingContext2D) {
   ctx.fillText("SEND EMAIL ↗", padLeft + btnW + 30 + btnW / 2, coAuthorBtnY + 28);
 
   // Helper note
-  ctx.font = "italic 400 28px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 400 26px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#6E665A";
   ctx.textAlign = "center";
-  ctx.fillText("Click either button above to connect on LinkedIn or send an email.", padLeft + contentW / 2, coAuthorBtnY + btnH + 46);
+  curY = wrapText(
+    ctx,
+    "Click either button above to connect on LinkedIn or send an email.",
+    padLeft + contentW / 2,
+    coAuthorBtnY + btnH + 34,
+    contentW,
+    36
+  );
 
   // Closing Epilogue Remark
-  ctx.font = "italic 600 38px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 600 36px 'Playfair Display', Georgia, serif";
   ctx.fillStyle = "#A85324";
   ctx.textAlign = "center";
-  ctx.fillText("“The book is not finished yet!”", padLeft + contentW / 2, coAuthorBtnY + btnH + 130);
+  ctx.fillText("“The book is not finished yet!”", padLeft + contentW / 2, curY + 36);
 
   ctx.font = "400 26px 'Inter', sans-serif";
   ctx.fillStyle = "#8C8275";
-  ctx.fillText("New milestones, architectures, and chapters are constantly being written.", padLeft + contentW / 2, coAuthorBtnY + btnH + 180);
+  wrapText(
+    ctx,
+    "New milestones, architectures, and chapters are constantly being written.",
+    padLeft + contentW / 2,
+    curY + 84,
+    contentW,
+    36
+  );
 
   // Page Number at Bottom
   ctx.font = "600 28px 'Playfair Display', Georgia, serif";
@@ -1131,11 +1184,15 @@ function renderSpread7Right(ctx: CanvasRenderingContext2D) {
 export function createLeftPageTexture(spreadIndex: number): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
   const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_WIDTH;
-  canvas.height = CANVAS_HEIGHT;
+  canvas.width = mobile ? 1024 : CANVAS_WIDTH;
+  canvas.height = mobile ? 1493 : CANVAS_HEIGHT;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
+
+  const scale = canvas.width / CANVAS_WIDTH;
+  ctx.scale(scale, scale);
 
   switch (spreadIndex) {
     case 0:
@@ -1177,11 +1234,15 @@ export function createLeftPageTexture(spreadIndex: number): THREE.CanvasTexture 
 export function createRightPageTexture(spreadIndex: number): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
   const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_WIDTH;
-  canvas.height = CANVAS_HEIGHT;
+  canvas.width = mobile ? 1024 : CANVAS_WIDTH;
+  canvas.height = mobile ? 1493 : CANVAS_HEIGHT;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
+
+  const scale = canvas.width / CANVAS_WIDTH;
+  ctx.scale(scale, scale);
 
   switch (spreadIndex) {
     case 0:
@@ -1219,3 +1280,4 @@ export function createRightPageTexture(spreadIndex: number): THREE.CanvasTexture
   texture.generateMipmaps = false;
   return texture;
 }
+

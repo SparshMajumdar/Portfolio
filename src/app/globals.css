@@ -46,6 +46,15 @@ html, body {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
+/* Hide scrollbar for clean touch carousels/navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Subtle grain texture overlay */
 .grain::after {
   content: '';
@@ -59,3 +68,4 @@ html, body {
   pointer-events: none;
   z-index: 9999;
 }
+

@@ -39,6 +39,12 @@ export default function BookScene() {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
+    // Mobile device detection for GPU memory and touch optimizations
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+
     // 1. Scene, Camera, Renderer, Clock
     const clock = new THREE.Clock();
     const scene = new THREE.Scene();
@@ -49,15 +55,15 @@ export default function BookScene() {
 
     // Studio Perspective Camera
     const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 60);
-    camera.position.set(0, 0.35, 7.8);
+    camera.position.set(0, 0.35, isMobile ? 8.6 : 7.8);
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: false,
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.LinearToneMapping;
@@ -72,8 +78,8 @@ export default function BookScene() {
     const keyLight = new THREE.DirectionalLight("#FFF9F0", 1.5);
     keyLight.position.set(4.2, 7.5, 5.0);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 2048;
-    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.mapSize.width = isMobile ? 1024 : 2048;
+    keyLight.shadow.mapSize.height = isMobile ? 1024 : 2048;
     keyLight.shadow.camera.near = 1;
     keyLight.shadow.camera.far = 20;
     keyLight.shadow.camera.left = -5;
@@ -331,6 +337,14 @@ export default function BookScene() {
     const getLeftTex = (spread: number): THREE.CanvasTexture | null => {
       let tex = leftTexturesCache.get(spread);
       if (!tex) {
+        // On mobile, limit cached textures to 4 to prevent WebGL context lost out-of-memory
+        if (isMobile && leftTexturesCache.size >= 4) {
+          const firstKey = leftTexturesCache.keys().next().value;
+          if (firstKey !== undefined && firstKey !== currentSpreadRef.current) {
+            leftTexturesCache.get(firstKey)?.dispose();
+            leftTexturesCache.delete(firstKey);
+          }
+        }
         const created = createLeftPageTexture(spread);
         if (created) {
           leftTexturesCache.set(spread, created);
@@ -343,6 +357,13 @@ export default function BookScene() {
     const getRightTex = (spread: number): THREE.CanvasTexture | null => {
       let tex = rightTexturesCache.get(spread);
       if (!tex) {
+        if (isMobile && rightTexturesCache.size >= 4) {
+          const firstKey = rightTexturesCache.keys().next().value;
+          if (firstKey !== undefined && firstKey !== currentSpreadRef.current) {
+            rightTexturesCache.get(firstKey)?.dispose();
+            rightTexturesCache.delete(firstKey);
+          }
+        }
         const created = createRightPageTexture(spread);
         if (created) {
           rightTexturesCache.set(spread, created);
@@ -380,6 +401,41 @@ export default function BookScene() {
       metalness: 0.01,
       side: THREE.DoubleSide,
     });
+
+    // Re-render textures when web fonts finish downloading
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        leftTexturesCache.forEach((t) => t.dispose());
+        rightTexturesCache.forEach((t) => t.dispose());
+        backTexturesCache.forEach((t) => t.dispose());
+        leftTexturesCache.clear();
+        rightTexturesCache.clear();
+        backTexturesCache.clear();
+
+        const newCover = createCoverTexture();
+        if (newCover && frontCoverMat) {
+          frontCoverMat.map = newCover;
+          frontCoverMat.needsUpdate = true;
+        }
+
+        const newBack = createBackCoverTexture();
+        if (newBack && backCoverMat) {
+          backCoverMat.map = newBack;
+          backCoverMat.needsUpdate = true;
+        }
+
+        const curL = getLeftTex(currentSpreadRef.current);
+        const curR = getRightTex(currentSpreadRef.current);
+        if (curL && leftPageMat) {
+          leftPageMat.map = curL;
+          leftPageMat.needsUpdate = true;
+        }
+        if (curR && rightPageMat) {
+          rightPageMat.map = curR;
+          rightPageMat.needsUpdate = true;
+        }
+      });
+    }
 
     // Right Page: Mounts on top of page block, starting right at spine hinge (-coverWidth / 2)
     const rightPageMesh = new THREE.Mesh(rightPageGeom, rightPageMat);
@@ -552,8 +608,8 @@ export default function BookScene() {
     const onPointerDown = (e: MouseEvent | TouchEvent) => {
       isDragging = true;
       hasDragged = false;
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      const clientX = "touches" in e && e.touches.length > 0 ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      const clientY = "touches" in e && e.touches.length > 0 ? e.touches[0].clientY : (e as MouseEvent).clientY;
 
       previousPointer.x = clientX;
       previousPointer.y = clientY;
@@ -564,8 +620,8 @@ export default function BookScene() {
     };
 
     const onPointerMove = (e: MouseEvent | TouchEvent) => {
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      const clientX = "touches" in e && e.touches.length > 0 ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      const clientY = "touches" in e && e.touches.length > 0 ? e.touches[0].clientY : (e as MouseEvent).clientY;
 
       if (isDragging) {
         const deltaX = clientX - previousPointer.x;
@@ -612,8 +668,8 @@ export default function BookScene() {
 
       // Click detected without significant drag movement
       if (!hasDragged) {
-        const clientX = "changedTouches" in e ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
-        const clientY = "changedTouches" in e ? e.changedTouches[0].clientY : (e as MouseEvent).clientY;
+        const clientX = "changedTouches" in e && e.changedTouches.length > 0 ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
+        const clientY = "changedTouches" in e && e.changedTouches.length > 0 ? e.changedTouches[0].clientY : (e as MouseEvent).clientY;
 
         pointer.x = (clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(clientY / window.innerHeight) * 2 + 1;
@@ -730,6 +786,10 @@ export default function BookScene() {
       }
     };
 
+    const onTouchCancel = () => {
+      isDragging = false;
+    };
+
     window.addEventListener("mousedown", onPointerDown);
     window.addEventListener("mousemove", onPointerMove, { passive: true });
     window.addEventListener("mouseup", onPointerUp);
@@ -737,6 +797,7 @@ export default function BookScene() {
     window.addEventListener("touchstart", onPointerDown, { passive: true });
     window.addEventListener("touchmove", onPointerMove, { passive: true });
     window.addEventListener("touchend", onPointerUp);
+    window.addEventListener("touchcancel", onTouchCancel);
 
     // 6. Resize Handler
     const onResize = () => {
@@ -777,8 +838,9 @@ export default function BookScene() {
         bookGroup.position.x = THREE.MathUtils.lerp(bookGroup.position.x, 0, 0.08);
         bookGroup.position.z = THREE.MathUtils.lerp(bookGroup.position.z, 0, 0.08);
 
-        // Camera in hero overview position
-        camera.position.z = THREE.MathUtils.lerp(camera.position.z, 7.8, 0.08);
+        // Responsive camera distance so the closed book doesn't clip off the left/right screen edges on phones
+        const closedDist = camera.aspect < 1.0 ? Math.max(8.6, 4.3 / camera.aspect) : 7.8;
+        camera.position.z = THREE.MathUtils.lerp(camera.position.z, closedDist, 0.08);
         camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.35, 0.08);
 
         // Combine full 360-degree drag rotation with subtle parallax
@@ -797,14 +859,16 @@ export default function BookScene() {
         floorShadow.rotation.z = bookGroup.rotation.y * 0.2;
       } else {
         // Open book mode: smoothly centered & camera eases in to frame the warm off-white pages
-        // When open, the spine is at x = -coverWidth / 2 = -1.06 inside bookGroup.
-        // By setting bookGroup.position.x = 1.06, the spine is EXACTLY centered at screen x = 0.0!
         bookGroup.position.y = THREE.MathUtils.lerp(bookGroup.position.y, 0.02, 0.08);
         bookGroup.position.x = THREE.MathUtils.lerp(bookGroup.position.x, coverWidth / 2, 0.08);
         bookGroup.position.z = THREE.MathUtils.lerp(bookGroup.position.z, 0.35, 0.08);
 
-        // Dynamic camera distance framing: fits both pages comfortably regardless of aspect ratio
-        const idealDist = Math.max(6.8, 8.8 / camera.aspect);
+        // Dynamic camera distance framing:
+        // On mobile in portrait (aspect < 0.85), frames the book comfortably so text is 50%+ larger and easy to read
+        const idealDist = camera.aspect < 0.85
+          ? Math.min(13.5, Math.max(7.2, 5.8 / camera.aspect))
+          : Math.max(6.8, 8.8 / camera.aspect);
+
         camera.position.z = THREE.MathUtils.lerp(camera.position.z, idealDist, 0.08);
         camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.02, 0.08);
 
@@ -890,6 +954,7 @@ export default function BookScene() {
       window.removeEventListener("touchstart", onPointerDown);
       window.removeEventListener("touchmove", onPointerMove);
       window.removeEventListener("touchend", onPointerUp);
+      window.removeEventListener("touchcancel", onTouchCancel);
       window.removeEventListener("resize", onResize);
       document.body.style.cursor = "default";
 
@@ -937,7 +1002,7 @@ export default function BookScene() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full pointer-events-auto"
+      className="absolute inset-0 w-full h-full pointer-events-auto touch-none"
     />
   );
 }

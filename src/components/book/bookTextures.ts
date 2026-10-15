@@ -71,25 +71,40 @@ function drawStar(
   ctx.fill();
 }
 
+export function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.innerWidth < 768 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  );
+}
+
 export function createCoverTexture(): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
+  const LOGICAL_W = 2048;
+  const LOGICAL_H = 2900;
+
   const canvas = document.createElement("canvas");
-  canvas.width = 2048;
-  canvas.height = 2900;
+  canvas.width = mobile ? 1024 : LOGICAL_W;
+  canvas.height = mobile ? 1450 : LOGICAL_H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
+  const scale = canvas.width / LOGICAL_W;
+  ctx.scale(scale, scale);
+
   // 1. Radiant burnt orange base matching the reference image exactly
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  const grad = ctx.createLinearGradient(0, 0, LOGICAL_W, LOGICAL_H);
   grad.addColorStop(0, "#F76826");
   grad.addColorStop(0.4, "#EE5C1C");
   grad.addColorStop(1, "#DC4E12");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
   // 2. Fine matte paper/cloth micro-grain (optimized pattern overlay)
-  applyGrainNoise(ctx, canvas.width, canvas.height, 0.035);
+  applyGrainNoise(ctx, LOGICAL_W, LOGICAL_H, 0.035);
 
   // 3. Subtle debossed spine crease on left
   const creaseGrad = ctx.createLinearGradient(0, 0, 110, 0);
@@ -98,12 +113,12 @@ export function createCoverTexture(): THREE.CanvasTexture | null {
   creaseGrad.addColorStop(0.9, "rgba(255, 255, 255, 0.05)");
   creaseGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = creaseGrad;
-  ctx.fillRect(0, 0, 110, canvas.height);
+  ctx.fillRect(0, 0, 110, LOGICAL_H);
 
   // 4. Subtle hardcover perimeter deboss border
   ctx.strokeStyle = "rgba(0, 0, 0, 0.10)";
   ctx.lineWidth = 2.5;
-  ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
+  ctx.strokeRect(55, 55, LOGICAL_W - 110, LOGICAL_H - 110);
 
   // 5. Editorial Typography & Star Icons (matching reference image)
   ctx.save();
@@ -111,7 +126,7 @@ export function createCoverTexture(): THREE.CanvasTexture | null {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const centerX = canvas.width / 2 + 25; // slight offset for spine
+  const centerX = LOGICAL_W / 2 + 25; // slight offset for spine
 
   // Top 4-pointed star
   drawStar(ctx, centerX, 600, 48, 12);
@@ -164,30 +179,37 @@ export function createCoverTexture(): THREE.CanvasTexture | null {
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = mobile ? 4 : 16;
   return texture;
 }
 
 export function createSpineTexture(): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
+  const LOGICAL_W = 512;
+  const LOGICAL_H = 2900;
+
   const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 2900;
+  canvas.width = mobile ? 256 : LOGICAL_W;
+  canvas.height = mobile ? 1450 : LOGICAL_H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
+  const scale = canvas.width / LOGICAL_W;
+  ctx.scale(scale, scale);
+
   // Base burnt orange
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  const grad = ctx.createLinearGradient(0, 0, LOGICAL_W, 0);
   grad.addColorStop(0, "#DC4E12");
   grad.addColorStop(0.3, "#EE5C1C");
   grad.addColorStop(0.7, "#F76826");
   grad.addColorStop(1, "#D6470E");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
   // Subtle grain (optimized pattern overlay)
-  applyGrainNoise(ctx, canvas.width, canvas.height, 0.035);
+  applyGrainNoise(ctx, LOGICAL_W, LOGICAL_H, 0.035);
 
   // Spine markings matching reference image:
   ctx.save();
@@ -195,7 +217,7 @@ export function createSpineTexture(): THREE.CanvasTexture | null {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const cx = canvas.width / 2;
+  const cx = LOGICAL_W / 2;
 
   // Top marks: + — |
   ctx.font = "500 58px 'Inter', sans-serif";
@@ -216,7 +238,7 @@ export function createSpineTexture(): THREE.CanvasTexture | null {
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = mobile ? 4 : 16;
   return texture;
 }
 
@@ -226,36 +248,43 @@ export function createSpineTexture(): THREE.CanvasTexture | null {
 export function createBackCoverTexture(): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
+  const LOGICAL_W = 2048;
+  const LOGICAL_H = 2900;
+
   const canvas = document.createElement("canvas");
-  canvas.width = 2048;
-  canvas.height = 2900;
+  canvas.width = mobile ? 1024 : LOGICAL_W;
+  canvas.height = mobile ? 1450 : LOGICAL_H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
+  const scale = canvas.width / LOGICAL_W;
+  ctx.scale(scale, scale);
+
   // 1. Radiant burnt orange base matching front cover exactly
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  const grad = ctx.createLinearGradient(0, 0, LOGICAL_W, LOGICAL_H);
   grad.addColorStop(0, "#F76826");
   grad.addColorStop(0.4, "#EE5C1C");
   grad.addColorStop(1, "#DC4E12");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
   // 2. Fine matte paper/cloth micro-grain matching front cover
-  applyGrainNoise(ctx, canvas.width, canvas.height, 0.035);
+  applyGrainNoise(ctx, LOGICAL_W, LOGICAL_H, 0.035);
 
   // 3. Subtle debossed spine crease on right (spine is on right when viewed from back)
-  const creaseGrad = ctx.createLinearGradient(canvas.width, 0, canvas.width - 110, 0);
+  const creaseGrad = ctx.createLinearGradient(LOGICAL_W, 0, LOGICAL_W - 110, 0);
   creaseGrad.addColorStop(0, "rgba(0, 0, 0, 0.20)");
   creaseGrad.addColorStop(0.6, "rgba(0, 0, 0, 0.06)");
   creaseGrad.addColorStop(0.9, "rgba(255, 255, 255, 0.05)");
   creaseGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = creaseGrad;
-  ctx.fillRect(canvas.width - 110, 0, 110, canvas.height);
+  ctx.fillRect(LOGICAL_W - 110, 0, 110, LOGICAL_H);
 
   // 4. Subtle hardcover perimeter deboss border
   ctx.strokeStyle = "rgba(0, 0, 0, 0.10)";
   ctx.lineWidth = 2.5;
-  ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
+  ctx.strokeRect(55, 55, LOGICAL_W - 110, LOGICAL_H - 110);
 
   // 5. Editorial Typography & Star Icons
   ctx.save();
@@ -263,7 +292,7 @@ export function createBackCoverTexture(): THREE.CanvasTexture | null {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const cx = canvas.width / 2 - 25; // Slight offset to optical center
+  const cx = LOGICAL_W / 2 - 25; // Slight offset to optical center
 
   // Top 4-pointed star
   drawStar(ctx, cx, 640, 50, 12);
@@ -309,8 +338,8 @@ export function createBackCoverTexture(): THREE.CanvasTexture | null {
   ctx.fillText("AZURE & AWS  •  DOCKER & CI/CD  •  IOT TELEMETRY", cx, 2140);
 
   // Realistic Barcode Block (Bottom Right)
-  const barcodeX = canvas.width - 680;
-  const barcodeY = canvas.height - 480;
+  const barcodeX = LOGICAL_W - 680;
+  const barcodeY = LOGICAL_H - 480;
   const barcodeW = 480;
   const barcodeH = 170;
 
@@ -346,23 +375,23 @@ export function createBackCoverTexture(): THREE.CanvasTexture | null {
   ctx.font = "500 28px 'Inter', sans-serif";
   ctx.letterSpacing = "2px";
   ctx.fillStyle = "rgba(22, 22, 22, 0.85)";
-  ctx.fillText("VIT-AP UNIVERSITY", 120, canvas.height - 420);
+  ctx.fillText("VIT-AP UNIVERSITY", 120, LOGICAL_H - 420);
   ctx.font = "400 24px 'Inter', sans-serif";
   ctx.fillStyle = "rgba(22, 22, 22, 0.65)";
-  ctx.fillText("B.Tech Computer Science '26", 120, canvas.height - 380);
+  ctx.fillText("B.Tech Computer Science '26", 120, LOGICAL_H - 380);
 
   // Center bottom prompt
   ctx.textAlign = "center";
   ctx.font = "600 30px 'Inter', sans-serif";
   ctx.letterSpacing = "8px";
   ctx.fillStyle = "rgba(22, 22, 22, 0.8)";
-  ctx.fillText("CLICK OR TAP TO OPEN RESUME →", cx, canvas.height - 200);
+  ctx.fillText("CLICK OR TAP TO OPEN RESUME →", cx, LOGICAL_H - 200);
 
   ctx.restore();
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = mobile ? 4 : 16;
   return texture;
 }
 
@@ -372,9 +401,10 @@ export function createBackCoverTexture(): THREE.CanvasTexture | null {
 export function createPageEdgesTexture(): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
+  const mobile = isMobileDevice();
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 512;
+  canvas.width = mobile ? 512 : 1024;
+  canvas.height = mobile ? 256 : 512;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
@@ -383,7 +413,8 @@ export function createPageEdgesTexture(): THREE.CanvasTexture | null {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Subtle horizontal page lines mimicking tightly bound individual sheets
-  for (let y = 0; y < canvas.height; y += 3) {
+  const step = mobile ? 4 : 3;
+  for (let y = 0; y < canvas.height; y += step) {
     const alpha = 0.05 + Math.random() * 0.08;
     ctx.fillStyle = `rgba(160, 140, 110, ${alpha})`;
     ctx.fillRect(0, y, canvas.width, 1);
@@ -410,7 +441,8 @@ export function createPageEdgesTexture(): THREE.CanvasTexture | null {
 export function createCheckerboardTexture(): THREE.CanvasTexture | null {
   if (typeof window === "undefined") return null;
 
-  const size = 1024;
+  const mobile = isMobileDevice();
+  const size = mobile ? 512 : 1024;
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
@@ -437,6 +469,6 @@ export function createCheckerboardTexture(): THREE.CanvasTexture | null {
   texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(1, 1); // 1-to-1 repeat per coordinate unit
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = mobile ? 4 : 16;
   return texture;
 }
